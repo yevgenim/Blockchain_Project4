@@ -1,0 +1,26 @@
+{
+  "name": "project4",
+  "version": "1.0.0",
+  "description": "A Private Blockchain Notary Service",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Blockchain",
+    "Udacity",
+    "Notary",
+    "Service",
+    "Rest",
+    "API",
+    "Project4"
+  ],
+  "author": "Yevgeni Mumblat",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "crypto-js": "^3.1.9-1",
+    "express": "^4.16.4",
+    "level": "^4.0.0"
+  }
+}
