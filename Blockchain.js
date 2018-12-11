@@ -38,7 +38,7 @@ class Blockchain{
 								reject(err);
 						}
 				});
-				console.log('Block ' + newBlock.height + ' submission performed');
+				console.log('Block ' + genBlock.height + ' submission performed');
 				console.log(genBlock);
 			}
 			newBlock.height = blockIndex;
@@ -51,12 +51,13 @@ class Blockchain{
 				newBlock.hash = SHA256(JSON.stringify(newBlock)).toString();
 				// Adding block object to chain
 				self.db.put(newBlock.height, JSON.stringify(newBlock).toString(), function(err) {
-						if (err) {
+					if (err) {
 								console.log('Block ' + newBlock.height + ' submission failed', err);
 								reject(err);
-						}
+					}
 				});
 				console.log('Block ' + newBlock.height + ' submission performed');
+				console.log(newBlock);
 				resolve(newBlock);
 			});
     },(reason) => {
@@ -73,24 +74,24 @@ class Blockchain{
 		return new Promise(function(resolve, reject){
 			let i = -1;
 			self.db.createReadStream()
-			.on('data', function (data) {
+				.on('data', function (data) {
 			      // Count each object inserted
-						i++;
-			 })
-			.on('error', function (err) {
+					i++;
+				 })
+				.on('error', function (err) {
 			    // reject with error
 					console.log('Unable to measure blockchain height!', err)
 					reject(err);
-			 })
-			 .on('close', function () {
+			 	})
+			 	.on('close', function () {
 			    //resolve with the count value
 					resolve(i);
 				});
 			});
 	}
 
-  // Get block
-  getBlock(key){
+  	// Get block by key (height)
+  	getBlock(key){
 		let self = this; // because we are returning a promise we will need this to be able to reference 'this' inside the Promise constructor
 		return new Promise(function(resolve, reject) {
 					 self.db.get(key, (err, value) => {
@@ -106,8 +107,54 @@ class Blockchain{
 		});
 	}
 
-  // Validate block
-  validateBlock(blockHeight){
+	// Get block by hash
+	getBlockByHash(hash) {
+		let self = this;
+		let block = null;
+		return new Promise(function(resolve, reject){
+			self.db.createReadStream()
+			.on('data', function (data) {
+				let jblock = Object.assign(new BlockClass.Block, JSON.parse(data.value));
+				if(jblock.hash === hash){
+					block = jblock;
+				}
+			})
+			.on('error', function (err) {
+				reject(err)
+			})
+			.on('close', function () {
+				resolve(block);
+			});
+		});
+	}
+
+	// Get block by hash
+	getBlockByWalletAddress(address) {
+		let self = this;
+		let block = [];
+		let i = 0;
+		return new Promise(function(resolve, reject){
+			self.db.createReadStream()
+			.on('data', function (data) {
+				let jblock = Object.assign(new BlockClass.Block, JSON.parse(data.value));		
+				if (jblock.height != 0){	
+					if(jblock.body.address === address){
+						block[i] = jblock;
+						i++;
+					}
+				}	
+			})
+			.on('error', function (err) {
+				reject(err)
+			})
+			.on('close', function () {
+				resolve(block);
+			});
+		});
+	}
+
+  	// Validate block
+  	validateBlock(blockHeight){
 		let self = this;
 		return new Promise(function(resolve, reject){
 			// Get block object
@@ -129,9 +176,9 @@ class Blockchain{
 					console.log('Could not read block ',reason);
 			});
 		});
-  }
+  	}
 
-  // Validate blockchain
+  	// Validate blockchain
 	validateChain(){
 		let self = this;
 		let errorLog = [];
