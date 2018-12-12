@@ -26,8 +26,8 @@ class Mempool {
         if  (poolObject === void 0) {
             let respObject = new IncomingRequest.RequestObject();
             respObject.walletAddress = wAddress;
-            respObject.message = respObject.walletAddress + ":" + respObject.requestTimeStamp + ":" + "starRegistry";
             respObject.requestTimeStamp = new Date().getTime().toString().slice(0,-3);
+            respObject.message = respObject.walletAddress + ":" + respObject.requestTimeStamp + ":" + "starRegistry";
             respObject.validationWindow = TimeoutRequestsWindowTime/1000;
 
             this.mempool.set(respObject.walletAddress,respObject);
